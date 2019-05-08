@@ -1,52 +1,105 @@
 # Ronny Ritprasert
 # Project
-# Last worked on 04/13/2019
 
 .data
 intro:
-    .ascii "\n=============\n"
-    .ascii "  GOLD RUSH\n"
-    .ascii "=============\n\n\0"
+    .ascii "\n================\n"
+    .ascii "  ALIEN DIGGER \n"
+    .ascii "================\n\n\0"
 rules:
     .ascii "Rules:\n"
-    .ascii "1. 20 weeks (5 months)\n"
-    .ascii "2. Panning for gold yields 0-25 dollars\n"
-    .ascii "3. A sluice yields 0-75 dollars (there is a 10% chance a sluice will break).\n"
-    .ascii "4. Food costs 10-20 dollars.\0"
+    .ascii "1. 25 weeks\n"
+    .ascii "2. Farming eggs yields 0-25 minerals\n"
+    .ascii "3. A nest yields 0-75 minerals (there is a 10% chance a nest will deplete).\n"
+    .ascii "4. Food costs 10-20 minerals.\n"
+    .ascii "6. Going to the brothel gives \"intelligence\" (1-2 levels)\n"
+    .ascii "7. Higher intelligence = more minerals gained when farming eggs!(0-25 * intelligence)\n"
+    .ascii "8. At 10 intelliigence, you can invade Earth. However, there is a 30% chance you die.\n"
+    .ascii "9. If you run out of minerals, you die.\n"
+    .ascii "10. Beware, humans lurk about. (20% chance)\n"
+    .ascii "11. There's a chance you run into a camp and KILL it(20% chance)\0"
+    
 prompt:
     .ascii "\nYou have $\0"
 prompt2:
-    .ascii " and \0"
+    .ascii ", \0"
 prompt3:
-    .ascii " sluice(s)\0"
+    .ascii " nest(s), and \0"
+prompt4:
+    .ascii " intelligence\0"
 option:
-    .ascii "\nDo you want to (1) buy a sluice for $100 (2) keep working?\n\0"
+    .ascii "\nDo you want to (1) build a nest for $100 (2) keep working\n"
+    .ascii "(3) visit the brothel, (4) invade Earth? (requires 10 intelligence)\n\0"
 week:
     .ascii "\n\nWEEK \0"
 panning:
-    .ascii "Panning for gold yields $\0"
-sluiceT:
-    .ascii "Sluice \0"
-sluiceY:
+    .ascii "Farming eggs yields $\0"
+nestT:
+    .ascii "Nest \0"
+nestY:
     .ascii " yields $\0"    
 inGold:
-    .ascii " in gold\n\0"
+    .ascii " in minerals\n\0"
 ate:
-    .ascii "You ate $\0"
+    .ascii "You devoured $\0"
 ate2:
     .ascii " in food\n\0"
 earned:
     .ascii "\n\nYou earned $\0"    
 spent:
-    .ascii " and spent $\0"
+    .ascii " and lost $\0"
 broke:
-    .ascii "\nSLUICE \0"
+    .ascii "\nNEST \0"
 broke2:
-    .ascii " BROKE!\0"
+    .ascii " DEPLETED!\0"
+robbedT:
+    .ascii "\nYou were attacked by humans! They rob you of 15 minerals.\0"
+brothelT:
+    .ascii "\nYou visit the brothel, you now have \0"
+intelligence:
+    .ascii " intelligence\n\0"
+discover:
+    .ascii "\nYou discover a camp made by Earthlings, you destory it and gain \0"
+invadeT:
+    .ascii "You invade Earth and plunder \0"
+minerals:
+    .ascii " minerals\n\0"
+deadT:
+    .ascii "Oh no!! You died during your invasion...\n\0"
+dead2T:
+    .ascii "\nYou ran out of minerals and died...\n\0"
+notEnough:
+    .ascii "Not Enough intelligence!\n\0"
 nl:
     .ascii "\n\0"   
 ending:
-    .ascii "\nYou ended the 20 weeks with $\0"
+    .ascii "\nYou ended with $\0"
+thanks:
+    .ascii "\nAlien Digger 2 coming soon.\n\0"
+
+# Not my own art, taken from asciiart.eu/space/aliens
+art:
+    .ascii "\n         __.,,------.._"
+    .ascii "\n      ,'\"   _      _   \"`." 
+    .ascii "\n     /.__, ._  -=- _\"`    Y"
+    .ascii "\n    (.____.-.`      \"\"`   j"
+    .ascii "\n     VvvvvvV`.Y,.    _.,-'       ,     ,     ,"
+    .ascii "\n        Y    ||,   '\"\         ,/    ,/    ./"
+    .ascii "\n        |   ,'  ,     `-..,'_,'/___,'/   ,'/   ,"
+    .ascii "\n    ..  ,;,,',-'\"\,'  ,  .     '     ' \"\"' '--,/    .. .."
+    .ascii "\n ,'. `.`---'     `, /  , Y -=-    ,'   ,   ,. .`-..||_|| .." 
+    .ascii "\nff\\`. `._        /f ,'j j , ,' ,   , f ,  \=\ Y   || ||`||_.."
+    .ascii "\nl` \` `.`.\"`-..,-' j  /./ /, , / , / /l \   \=\l   || `' || ||..." 
+    .ascii "\n `  `   `-._ `-.,-/ ,' /`\"/-/-/-/-\"'''\"`.`.  `'.\--`'--..`'_`' || ,"
+    .ascii "\n            \"`-_,',  ,'  f    ,   /      `._    ``._     ,  `-.`'//         ,"
+    .ascii "\n          ,-\"'' _.,-'    l_,-'_,,'          \"`-._ . \"`. /|     `.'\ ,       |"
+    .ascii "\n        ,',.,-'\"          \=) ,`-.         ,    `-'._`.V |       \ // .. . /j"
+    .ascii "\n        |f\\               `._ )-.\"`.     /|         `.| |        `.`-||-\\/"
+    .ascii "\n        l` \`                 \"`._   \"`--' j          j' j          `-`---'"
+    .ascii "\n         `  `                     \"`,-  ,'/       ,-'\"  /"
+    .ascii "\n                                 ,'\",__,-'       /,, ,-'"
+    .ascii "\n                                 Vvv'            VVv'\n\0"
+
 
 .text
 .global _start
@@ -56,27 +109,33 @@ _start:
     call SetForeColor    # Sets color to yellow
     mov  $intro, %rcx
     call PrintCString
-    mov  $1, %rcx
+    mov  $7, %rcx
     call SetForeColor    # Returns color to white (by re-setting to white)
+    mov  $6, %rcx
+    call SetForeColor
     mov  $rules, %rcx
     call PrintCString    # End of intro + rules
     mov  $7, %rcx
     call SetForeColor
-    mov  $100, %r9       # Money the player starts with
+    mov  $300, %r9       # Money the player starts with
+    mov  $0, %r14        # Start with 0 intelligence
 
-# (if you have to print it, it has to be in rcx) can't use lower registers.. or can u?
 # My table
 # r8 = amount of weeks
 # r9 = total gold so far
-# r10 = amount of sluices
+# r10 = amount of nests
 # r11 = gold earned that week
 # r12 = expenses/spent
-# r13 = sluice increment
+# r13 = nest increment
+# r14 = intelligence
 
-while:                   # Loops until set number of weeks go by
+begin:                   # Loops until set number of weeks go by
     mov  $0, %r11        # Reset gold earned that week to 0
     mov  $0, %r12        # Reset gold spent that week to 0
-    mov  $0, %r13        # Reset sluice count to 0
+    mov  $0, %r13        # Reset nest count to 0
+    
+    cmp  $0, %r9
+    jle  dead2
     
     mov  $week, %rcx
     call PrintCString    # Prints "WEEK"
@@ -95,16 +154,37 @@ while:                   # Loops until set number of weeks go by
     call SetForeColor    # White
     mov  $prompt2, %rcx
     call PrintCString
-    mov  %r10, %rcx      # how many sluices
-    call PrintInt    
+    mov  $2, %rcx
+    call SetForeColor
+    mov  %r10, %rcx      # how many nests
+    call PrintInt
+    mov  $7, %rcx
+    call SetForeColor    
     mov  $prompt3, %rcx
+    call PrintCString
+    mov  $6, %rcx
+    call SetForeColor
+    mov  %r14, %rcx
+    call PrintInt
+    mov  $7, %rcx
+    call SetForeColor
+    mov  $prompt4, %rcx
     call PrintCString
     mov  $option, %rcx   # Asks user for option
     call PrintCString
-    call ScanInt
     
+options:
+    call ScanInt
+    mov  %rcx, %rax
     cmp  $1, %rcx
     je   buy
+    cmp  $2, %rcx
+    je   pan
+    cmp  $3, %rcx
+    je   brothel
+    cmp  $4, %rcx
+    je   invade
+    jmp  options
         
 pan:    
     mov  $panning, %rcx  
@@ -113,6 +193,7 @@ pan:
     call SetForeColor
     mov  $26, %rcx       # Gets random gold 0-25
     call Random
+    imul %r14, %rcx
     call PrintInt
     add  %rcx, %r11      # adds to gold earned that week
     add  %rcx, %r9       # Adds gold collected that week to total gold
@@ -121,7 +202,7 @@ pan:
     mov  $inGold, %rcx 
     call PrintCString    # Prints "of gold"
     cmp  $0, %r10
-    jg   sluice
+    jg   nest
    
 eat:
     mov  $ate, %rcx
@@ -138,18 +219,30 @@ eat:
     call SetForeColor
     mov  $ate2, %rcx
     call PrintCString    # in food
-
-    mov  $0, %r13           #NEW R13 NOW r13 checks for broken sluices
+    cmp  $3, %rax
+    je   afterBrothel
+    cmp  $4, %rax
+    je   afterBrothel
+    mov  $0, %r13           #NEW R13 NOW r13 checks for broken nest
 cont:
     mov  $10, %rcx
     call Random
     add  $1, %r13
     cmp  $0, %rcx         # rcx has 0-9
-    je   broken           # broken sluices go here
+    je   broken           # broken nests go here
     cmp  %r10, %r13 
     jle  cont
-
-go:    
+afterBrothel:
+    mov  $5, %rcx         #20% chance of getting robbed
+    call Random
+    cmp  $0, %rcx
+    je   robbed
+afterRob:
+    mov  $5, %rcx
+    call Random
+    cmp  $0, %rcx
+    je   camp    
+go:       
     mov  $earned, %rcx
     call PrintCString    # "you earned "
     mov  $3, %rcx
@@ -168,11 +261,70 @@ go:
     mov  $7, %rcx
     call SetForeColor
 
-    cmp  $20, %r8         # Total amount of weeks there are (length of game)
-    jl   while
+    cmp  $25, %r8         # Total amount of weeks there are (length of game)
+    jl   begin
     jmp  end             
-    			 # r10 is sluices: if r10 > 0 print sluice 1 yields...
+    			 # r10 is nests: if r10 > 0 print nest 1 yields...
                          # gold gained + in gold.
+notEnoughL:
+    mov  $notEnough, %rcx
+    call PrintCString
+    jmp  options
+                         
+camp:
+    mov  $discover, %rcx
+    call PrintCString
+    mov  $1, %rcx
+    call PrintInt
+    add  $1, %r14
+    mov  $intelligence, %rcx
+    call PrintCString
+    jmp  go
+
+invade:
+    cmp  $10, %r14
+    jl   notEnoughL
+    mov  $invadeT, %rcx
+    call PrintCString
+    mov  $700, %rcx
+    call Random
+    add  $400, %rcx
+    call PrintInt
+    add  %rcx, %r11
+    add  %rcx, %r9
+    mov  $minerals, %rcx
+    call PrintCString
+    mov  $10, %rcx
+    call Random
+    cmp  $2, %rcx
+    jle  dead
+    jmp  go    
+                         
+brothel:
+    mov  $2, %rcx
+    call Random
+    add  $1, %rcx
+    add  %rcx, %r14
+    mov  $brothelT, %rcx
+    call PrintCString
+    mov  $6, %rcx
+    call SetForeColor
+    mov  %r14, %rcx
+    call PrintInt
+    mov  %rcx, %r14
+    mov  $7, %rcx
+    call SetForeColor
+    mov  $intelligence, %rcx
+    call PrintCString
+    jmp  eat
+                         
+robbed:
+    mov  $robbedT, %rcx
+    call PrintCString
+    sub  $15, %r9
+    add  $15, %r12
+    jmp  afterRob
+                         
 buy:
     cmp $100, %r9
     jl  pan
@@ -181,14 +333,13 @@ buy:
     add $100, %r12
     jmp pan
 
-sluice:
+nest:
     add  $1, %r13
-    
-    mov  $sluiceT, %rcx
+    mov  $nestT, %rcx
     call PrintCString
     mov  %r13, %rcx
     call PrintInt
-    mov  $sluiceY, %rcx    # yields 
+    mov  $nestY, %rcx    # yields 
     call PrintCString
     mov  $3, %rcx
     call SetForeColor
@@ -203,7 +354,7 @@ sluice:
     call PrintCString
     
     cmp  %r10, %r13
-    jl   sluice    
+    jl   nest    
     jmp  eat
 
 broken:
@@ -223,16 +374,32 @@ broken:
     sub  $1, %r10
     jmp  cont
 
+dead2:
+    mov  $1, %rcx
+    call SetForeColor
+    mov  $dead2T, %rcx
+    call PrintCString
+    jmp  end
+
+dead:
+    mov  $1, %rcx
+    call SetForeColor
+    mov  $deadT, %rcx
+    call PrintCString
+
 end:
     mov  $ending, %rcx
     call PrintCString
-    mov  $3, %rcx
-    call SetForeColor
     mov  %r9, %rcx
     call PrintInt
-    mov  $7, %rcx
-    call SetForeColor
     mov  $nl, %rcx
     call PrintCString
+    mov  $art, %rcx
+    call PrintCString
+    mov  $thanks, %rcx
+    call PrintCString
+    mov  $7, %rcx
+    call SetForeColor
     call EndProgram
+
 
